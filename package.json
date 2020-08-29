@@ -1,0 +1,27 @@
+{
+  "name": "magx-client",
+  "version": "0.6.2",
+  "description": "magx-server javascript client",
+  "main": "dist/index.js",
+  "scripts": {
+    "patch": "tsc && npm version patch && webpack --env.production",
+    "major": "tsc && npm version major && webpack --env.production",
+    "minor": "tsc && npm version minor && webpack --env.production",
+    "build": "webpack --env.production",
+    "build-dev": "webpack"
+  },
+  "author": "Damir Yusipov",
+  "license": "MIT",
+  "dependencies": {
+    "notepack.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.20",
+    "ts-loader": "^8.0.0",
+    "ts-node": "^8.10.2",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.6",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  }
+}
