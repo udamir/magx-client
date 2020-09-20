@@ -10,6 +10,7 @@
     "build": "webpack --env.production",
     "build-dev": "webpack"
   },
+  "keywords": ["magx", "js client", "realtime", "websockets"],
   "author": "Damir Yusipov",
   "license": "MIT",
   "dependencies": {

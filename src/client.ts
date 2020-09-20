@@ -85,7 +85,7 @@ export class Client {
     return this.auth
   }
 
-  public async getRooms(name: string | string[]) {
+  public async getRooms(name: string | string[] = []) {
     if (!this.auth) { throw new Error(`Not authenticated`) }
 
     if(!Array.isArray(name)) { name = [name] }
