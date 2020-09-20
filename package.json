@@ -1,6 +1,6 @@
 {
   "name": "magx-client",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "magx-server javascript client",
   "main": "dist/index.js",
   "scripts": {
@@ -10,7 +10,12 @@
     "build": "webpack --env.production",
     "build-dev": "webpack"
   },
-  "keywords": ["magx", "js client", "realtime", "websockets"],
+  "keywords": [
+    "magx",
+    "js client",
+    "realtime",
+    "websockets"
+  ],
   "author": "Damir Yusipov",
   "license": "MIT",
   "dependencies": {
