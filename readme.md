@@ -23,34 +23,27 @@ or you can include magx-client package to server dependencies and use it on clie
 
 ## Usage
 
-### Connecting to server:
+### Connecting to server
 ```js
 var client = new MagX.Client({ address: "localhost", port: 3001, secure: true })
-```
 
-### Authenticate
-```js
+// Authenticate
 await client.authenticate({ login, password })
-```
 
-or verify your session
-```js
+// or verify your session
 await client.verify(token)
-```
 
-### Get avaliable rooms
-```js
+// Get avaliable rooms
 const rooms = await client.getRooms("lobby")
-```
 
-### Create new room
-```js
+// create new room
 const room = await client.createRoom(name, params)
-```
 
-### Joining to a room
-```js
+// or join to existing room
 const room = await client.joinRoom(roomId, params)
+
+// or reconnect to room
+const room = await client.reconnect(roomId)
 ```
 
 ### Handle room events
@@ -91,7 +84,7 @@ room.onLeave(() => {
 })
 ```
 
-### Use methods
+### Use room methods
 ```js
 // send message
 send(type, data)
@@ -105,6 +98,16 @@ room.close() {
 // update room params
 room.update(update)
 ```
+
+## Examples
+
+The easiest way to try out magx-client is using the magx-example:
+```
+git clone https://github.com/udamir/magx-examples.git
+cd magx-examples
+npm install
+```
+To run the MagX server, run npm start
 
 # License
 MIT
