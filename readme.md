@@ -8,6 +8,11 @@ JavaScript/TypeScript Client for MagX multiplayer game server.
 ```
 npm install --save magx-client
 ```
+and include it to your project
+```ts
+import { Client } from "magx-client"
+```
+
 
 ### CDN link
 
