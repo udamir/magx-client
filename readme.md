@@ -1,5 +1,5 @@
 # Magx JS client
-<img alt="npm" src="https://img.shields.io/npm/v/magx-client"> <img alt="npm" src="https://img.shields.io/npm/dm/magx-client?label=npm"> <img alt="GitHub" src="https://img.shields.io/github/license/udamir/magx-client">
+<img alt="npm" src="https://img.shields.io/npm/v/magx-client"> <img alt="npm" src="https://img.shields.io/npm/dm/magx-client?label=npm"> <img alt="CircleCI" src="https://img.shields.io/circleci/build/github/udamir/magx-client?token=71d65bfb5432f9a6e372fd71a8edfe7e733b693f"> <img alt="GitHub" src="https://img.shields.io/github/license/udamir/magx-client">
 
 
 JavaScript/TypeScript Client for MagX multiplayer game server.
