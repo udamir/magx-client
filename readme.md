@@ -1,4 +1,6 @@
 # Magx JS client
+<img alt="npm" src="https://img.shields.io/npm/v/magx-client"> <img alt="npm" src="https://img.shields.io/npm/dm/magx-client?label=npm"> <img alt="GitHub" src="https://img.shields.io/github/license/udamir/magx-client">
+
 
 JavaScript/TypeScript Client for MagX multiplayer game server.
 
@@ -112,7 +114,7 @@ git clone https://github.com/udamir/magx-examples.git
 cd magx-examples
 npm install
 ```
-To run the MagX server, run npm start
+To run the MagX server, run ```npm start```
 
 # License
 MIT
