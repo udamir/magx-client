@@ -117,4 +117,4 @@ npm install
 To run the MagX server, run ```npm start```
 
 # License
-MIT
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fudamir%2Fmagx-client.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fudamir%2Fmagx-client?ref=badge_large)
