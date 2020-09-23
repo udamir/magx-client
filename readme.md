@@ -1,4 +1,6 @@
 # Magx JS client
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fudamir%2Fmagx-client.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fudamir%2Fmagx-client?ref=badge_shield)
+
 <img alt="npm" src="https://img.shields.io/npm/v/magx-client"> <img alt="npm" src="https://img.shields.io/npm/dm/magx-client?label=npm"> <img alt="CircleCI" src="https://img.shields.io/circleci/build/github/udamir/magx-client?token=71d65bfb5432f9a6e372fd71a8edfe7e733b693f"> <img alt="GitHub" src="https://img.shields.io/github/license/udamir/magx-client">
 
 
@@ -118,3 +120,6 @@ To run the MagX server, run ```npm start```
 
 # License
 MIT
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fudamir%2Fmagx-client.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fudamir%2Fmagx-client?ref=badge_large)
