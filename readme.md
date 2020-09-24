@@ -94,7 +94,7 @@ room.onLeave(() => {
 ### Use room methods
 ```js
 // send message
-send(type, data)
+room.send(type, data)
 
 // leave room
 room.leave()
