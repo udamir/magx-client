@@ -29,21 +29,35 @@ export class WSConnection implements IConnection {
   }
 
   public onMessage(handler: (message: IMessage) => any) {
-    this.ws.onmessage = (event: MessageEvent) => {
-      if (event.data.arrayBuffer) {
+    this.ws.onmessage = (msg: MessageEvent) => {
+      const processMessage = (bufArray: ArrayBuffer) => {
+        const buffer = new Int8Array(bufArray)
+        const event = buffer[0]
+        const data = buffer.slice(1)
+        const args = event < 0 ? [data] : this.messagePack.decode<any[]>(data)
+        handler({ event, args })
+      }
+
+      if (msg.data.arrayBuffer) {
         // event data - Buffer
-        event.data.arrayBuffer().then((buffer: Buffer) => {
-          handler(this.messagePack.decode<IMessage>(buffer))
+        msg.data.arrayBuffer().then((buffer: Buffer) => {
+          processMessage(buffer)
         })
       } else {
         // event data - BufferArray
-        handler(this.messagePack.decode<IMessage>(event.data))
+        processMessage(msg.data)
       }
     }
   }
 
   public send(message: IMessage): void {
-    this.ws.send(this.messagePack.encode(message))
+    const data = this.messagePack.encode(message.args)
+    const dataBuffer = new Uint8Array(data)
+    const bufArray = new ArrayBuffer(data.byteLength + 1)
+    const buffer = new Uint8Array(bufArray)
+    buffer[0] = message.event
+    buffer.set(dataBuffer, 1)
+    this.ws.send(bufArray)
   }
 
   public close() {

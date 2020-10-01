@@ -1,4 +1,6 @@
-import { Client, IJsonPatch, IConnection, IMessage, IRoomUpdate } from "."
+import { decode } from "notepack.io"
+
+import { Client, IJsonPatch, IConnection, IMessage, IRoomUpdate, ClientEvent } from "."
 
 interface IChangeHandler {
   op: string
@@ -20,6 +22,8 @@ export class Room {
   public name: string
   public patchIndex: number = 0
   public options: any
+  public decodeMap: any | null
+  public decodeMapIndex: string[]
 
   public handlers: { [event: string]: any } = {}
 
@@ -28,6 +32,8 @@ export class Room {
     this.port = roomData.port || this.client.port
     this.name = roomData.name
     this.options = roomData.options || {}
+    this.decodeMap = null
+    this.decodeMapIndex = []
 
     this.handlers = {
       _message: {},
@@ -51,21 +57,22 @@ export class Room {
 
       const onRequest: any = (type: string, data: any, reqId: string) => {
         this.handlers._request[type] && this.handlers._request[type](data).then((result: any) => {
-          this.connection && this.connection.send({ event: "_response", args: [reqId, result]})
+          this.connection && this.connection.send({ event: ClientEvent.response, args: [reqId, result]})
         })
       }
 
-      const onSnapshot: any = (index: number, snapshot: any) => {
-        this.patchIndex = index
+      const onSnapshot: any = (snapshot: any, decodeMap: any) => {
         this.handlers._snapshot && this.handlers._snapshot(snapshot)
+        if (this.client.serializer === "light") {
+          this.decodeMap = decodeMap
+          this.decodeMapIndex = []
+          Object.keys(decodeMap).forEach((key) => {
+            this.decodeMapIndex[decodeMap[key].index] = key
+          })
+        }
       }
 
-      const onPatch: any = (index: number, patch: any) => {
-        if (this.patchIndex !== index - 1) {
-          console.log("Patch error", this.patchIndex, index, patch)
-          return
-        }
-        this.patchIndex = index
+      const onPatch: any = (patch: IJsonPatch) => {
         this.handlers._patch && this.handlers._patch(patch)
 
         const handlers: IChangeHandler[] = this.handlers._change || []
@@ -90,6 +97,62 @@ export class Room {
         }
       }
 
+      const onEncodedPatch: any = (buffer: Int8Array) => {
+        try {
+          if (this.client.serializer === "mpack") {
+            const patchArr = decode<any[]>(buffer).reverse()
+
+            const patch: IJsonPatch = {
+              op: ["add", "replace", "remove"][patchArr.pop()] as any,
+              path: patchArr.pop(),
+            }
+
+            if (patchArr.length && patch.op !== "remove") {
+              patch.value = patchArr.pop()
+            }
+
+            if (patchArr.length && patch.op !== "add") {
+              patch.oldValue = patchArr.pop()
+            }
+
+            onPatch(patch)
+          } else if (this.client.serializer === "light") {
+            if (!this.decodeMap) {
+              throw new Error("Cannot decompress patch - schema not found!")
+            }
+
+            const op = ["add", "replace", "remove"][buffer[0]]
+            const offset = buffer[1]
+            const params = decode<any[]>(buffer.slice(offset + 2))
+
+            let path = ""
+            let paramIndex = 0
+
+            for (let i = 2; i < offset + 2; i += 1) {
+              const schemaIndex = buffer[i]
+              if (schemaIndex < 0) {
+                path += "/" + params[paramIndex++]
+              } else {
+                const typeSchema = this.decodeMap[this.decodeMapIndex[schemaIndex]]
+                path += "/" + typeSchema.props[buffer[++i]]
+              }
+            }
+
+            if (params.length - paramIndex > 1) {
+              onPatch({ op, path, value: params[paramIndex], oldValue: params[paramIndex + 1] })
+            } else if (params.length - paramIndex > 0) {
+              onPatch({ op, path, value: params[paramIndex] })
+            } else {
+              onPatch({ op, path })
+            }
+          } else {
+            throw new Error(`Unknown serializer: ${this.client.serializer}`)
+          }
+        } catch (error) {
+          throw new Error(error)
+        }
+      }
+
       const onConnected: any = () => {
         this.handlers._connected && this.handlers._connected()
       }
@@ -99,12 +162,13 @@ export class Room {
       }
 
       switch (msg.event) {
-        case "_connected": return onConnected()
-        case "_snapshot": return onSnapshot(...msg.args)
-        case "_message": return onMessage(...msg.args)
-        case "_request": return onRequest(...msg.args)
-        case "_patch": return onPatch(...msg.args)
-        case "_error": return onError(...msg.args)
+        case ClientEvent.connected: return onConnected()
+        case ClientEvent.snapshot: return onSnapshot(...msg.args)
+        case ClientEvent.message: return onMessage(...msg.args)
+        case ClientEvent.request: return onRequest(...msg.args)
+        case ClientEvent.patch: return onPatch(...msg.args)
+        case ClientEvent.encodedPatch: return onEncodedPatch(...msg.args)
+        case ClientEvent.error: return onError(...msg.args)
       }
     })
   }
@@ -156,7 +220,7 @@ export class Room {
   }
 
   public send(type: string, data?: any) {
-    this.connection && this.connection.send({ event: "_message", args: [ type, data ] })
+    this.connection && this.connection.send({ event: ClientEvent.message, args: [ type, data ] })
   }
 
   public onLeave(handler: () => void) {

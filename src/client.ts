@@ -4,15 +4,34 @@ export interface IJsonPatch {
   op: "replace" | "add" | "remove"
   path: string
   value?: any
+  oldValue?: any
+}
+
+export const ClientEvent = {
+  error: 0,
+  connected: 1,
+  reconnected: 2,
+  joined: 3,
+
+  message: 4,
+  request: 5,
+  response: 6,
+
+  snapshot: 11,
+  patch: 12,
+
+  schema: 20,
+  encodedSnapshot: -11,
+  encodedPatch: -12,
 }
 
 export interface IMessagePack {
-  encode<T>(value: T): any
-  decode<T>(buffer: any): T
+  encode<T>(value: T): ArrayBuffer
+  decode<T>(buffer: ArrayBuffer): T
 }
 
 export interface IMessage {
-  event: string
+  event: number
   args: any[]
 }
 
@@ -51,6 +70,7 @@ export interface IClientParams {
   id?: string
   token?: string
   data?: any
+  serializer?: string
   transport?: (params: ICTParams) => IConnection
 }
 
@@ -60,10 +80,12 @@ export class Client {
   public address: string
   public port?: number
   public transport: (params: ICTParams) => IConnection
+  public serializer = ""
 
   constructor(params: IClientParams) {
     this.address = params.address || "localhost"
     this.port = params.port
+    this.serializer = params.serializer || "mpack"
 
     this.uri = `${params.secure ? "https" : "http"}://${this.address}${this.port ? ":" + this.port : ""}/magx`
     this.transport = params.transport || ((p) => new WSConnection(p))
@@ -147,7 +169,7 @@ export class Client {
     return new Promise((resolve, reject) => {
       const room = new Room(this, data)
       room.onConnected(() => {
-        room.connection.send({ event: reconnect ? "_reconnected" : "_joined", args: [] })
+        room.connection.send({ event: reconnect ? ClientEvent.reconnected : ClientEvent.joined, args: [] })
         resolve(room)
       })
       room.onError((code, error) => reject(`${code} - ${error}`))
