@@ -10,7 +10,7 @@ module.exports = function(options) {
         mode: "production",
         entry: {
             "magx": path.join(__dirname, "src/index.ts"),
-            "magx.min": path.join(__dirname, "src/index.ts"),
+            "magx.dev": path.join(__dirname, "src/index.ts"),
         },
         output: {
             path: path.join(__dirname, "./dist/"),
@@ -41,7 +41,7 @@ module.exports = function(options) {
         optimization: {
             minimize: true,
             minimizer: [new UglifyJsPlugin({
-                include: /\.min\.js$/
+                exclude: /\.dev\.js$/
             })]
         },
 
