@@ -4,11 +4,10 @@
   "description": "magx-server javascript client",
   "main": "dist/index.js",
   "scripts": {
-    "patch": "tsc && npm version patch && webpack --env.production",
-    "major": "tsc && npm version major && webpack --env.production",
-    "minor": "tsc && npm version minor && webpack --env.production",
-    "build": "webpack --env.production",
-    "build-dev": "webpack"
+    "patch": "tsc && npm version patch && webpack",
+    "major": "tsc && npm version major && webpack",
+    "minor": "tsc && npm version minor && webpack",
+    "build": "webpack"
   },
   "keywords": [
     "magx",
@@ -19,7 +18,8 @@
   "author": "Damir Yusipov",
   "license": "MIT",
   "dependencies": {
-    "notepack.io": "^2.3.0"
+    "notepack.io": "^2.3.0",
+    "uglifyjs-webpack-plugin": "^2.2.0"
   },
   "devDependencies": {
     "@types/node": "^14.0.20",
