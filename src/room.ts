@@ -49,7 +49,6 @@ export class Room {
     this.connection = this.client.transport({ url })
 
     this.connection.onMessage((msg: IMessage) => {
-      if (!msg.event) { return }
 
       const onMessage: any = (type: string, data: any): void => {
         this.handlers._message[type] && this.handlers._message[type](data)
