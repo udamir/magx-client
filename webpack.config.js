@@ -11,14 +11,14 @@ module.exports = function(options) {
         entry: {
             "magx": path.join(__dirname, "src/index.ts"),
             "magx.dev": path.join(__dirname, "src/index.ts"),
-            libraryTarget: "umd",
-            library: "MagX"
         },
         output: {
             path: path.join(__dirname, "./dist/"),
             filename: "[name].js",
 
             globalObject: "self || this", // compatibility with Web Workers.
+            libraryTarget: "umd",
+            library: "MagX"
         },
 
         // devtool: 'inline-source-map',
@@ -33,10 +33,6 @@ module.exports = function(options) {
             new webpack.BannerPlugin({ banner: `magx.js@${pkg.version}` }),
             // new webpack.optimize.UglifyJsPlugin({ include: /\.min\.js$/, minimize: true})
         ],
-
-        // hack: react-native is not used for the distribution build
-        externals: {
-        },
 
         optimization: {
             minimize: true,

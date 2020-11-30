@@ -1,6 +1,6 @@
 {
   "name": "magx-client",
-  "version": "0.6.7",
+  "version": "0.7.0",
   "description": "magx-server javascript client",
   "main": "dist/index.js",
   "scripts": {
