@@ -11,6 +11,8 @@ module.exports = function(options) {
         entry: {
             "magx": path.join(__dirname, "src/index.ts"),
             "magx.dev": path.join(__dirname, "src/index.ts"),
+            libraryTarget: "umd",
+            library: "MagX"
         },
         output: {
             path: path.join(__dirname, "./dist/"),
