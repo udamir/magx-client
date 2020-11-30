@@ -1,4 +1,5 @@
 import { send, WSConnection, Room, IRoomData } from "."
+import { ISerializer } from "./serializer"
 
 export interface IJsonPatch {
   op: "replace" | "add" | "remove"
@@ -70,7 +71,7 @@ export interface IClientParams {
   id?: string
   token?: string
   data?: any
-  serializer?: string
+  serializer?: ISerializer
   transport?: (params: ICTParams) => IConnection
 }
 
@@ -80,13 +81,12 @@ export class Client {
   public address: string
   public port?: number
   public transport: (params: ICTParams) => IConnection
-  public serializer = ""
+  public serializer?: ISerializer
 
   constructor(params: IClientParams) {
     this.address = params.address || "localhost"
     this.port = params.port
-    this.serializer = params.serializer || "mpack"
-
+    this.serializer = params.serializer
     this.uri = `${params.secure ? "https" : "http"}://${this.address}${this.port ? ":" + this.port : ""}/magx`
     this.transport = params.transport || ((p) => new WSConnection(p))
   }

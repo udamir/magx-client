@@ -1,5 +1,3 @@
-import { decode } from "notepack.io"
-
 import { Client, IJsonPatch, IConnection, IMessage, IRoomUpdate, ClientEvent } from "."
 
 interface IChangeHandler {
@@ -22,8 +20,6 @@ export class Room {
   public name: string
   public patchIndex: number = 0
   public options: any
-  public decodeMap: any | null
-  public decodeMapIndex: string[]
 
   public handlers: { [event: string]: any } = {}
 
@@ -32,8 +28,6 @@ export class Room {
     this.port = roomData.port || this.client.port
     this.name = roomData.name
     this.options = roomData.options || {}
-    this.decodeMap = null
-    this.decodeMapIndex = []
 
     this.handlers = {
       _message: {},
@@ -60,15 +54,11 @@ export class Room {
         })
       }
 
-      const onSnapshot: any = (snapshot: any, decodeMap: any) => {
-        this.handlers._snapshot && this.handlers._snapshot(snapshot)
-        if (this.client.serializer === "light") {
-          this.decodeMap = decodeMap
-          this.decodeMapIndex = []
-          Object.keys(decodeMap).forEach((key) => {
-            this.decodeMapIndex[decodeMap[key].index] = key
-          })
+      const onSnapshot: any = (snapshot: any) => {
+        if (this.client.serializer) {
+          snapshot = this.client.serializer.decodeState(snapshot)
         }
+        this.handlers._snapshot && this.handlers._snapshot(snapshot)
       }
 
       const onPatch: any = (patch: IJsonPatch) => {
@@ -96,56 +86,11 @@ export class Room {
         }
       }
 
-      const onEncodedPatch: any = (buffer: Int8Array) => {
+      const onEncodedPatch: any = (buffer: any) => {
         try {
-          if (this.client.serializer === "mpack") {
-            const patchArr = decode<any[]>(buffer).reverse()
-
-            const patch: IJsonPatch = {
-              op: ["add", "replace", "remove"][patchArr.pop()] as any,
-              path: patchArr.pop(),
-            }
-
-            if (patchArr.length && patch.op !== "remove") {
-              patch.value = patchArr.pop()
-            }
-
-            if (patchArr.length && patch.op !== "add") {
-              patch.oldValue = patchArr.pop()
-            }
-
+          if (this.client.serializer) {
+            const patch = this.client.serializer.decodePatch(buffer)
             onPatch(patch)
-          } else if (this.client.serializer === "light") {
-            if (!this.decodeMap) {
-              throw new Error("Cannot decompress patch - schema not found!")
-            }
-
-            const op = ["add", "replace", "remove"][buffer[0]]
-            const offset = buffer[1]
-            const params = decode<any[]>(buffer.slice(offset + 2))
-
-            let path = ""
-            let paramIndex = 0
-
-            for (let i = 2; i < offset + 2; i += 1) {
-              const schemaIndex = buffer[i]
-              if (schemaIndex < 0) {
-                path += "/" + params[paramIndex++]
-              } else {
-                const typeSchema = this.decodeMap[this.decodeMapIndex[schemaIndex]]
-                path += "/" + typeSchema.props[buffer[++i]]
-              }
-            }
-
-            if (params.length - paramIndex > 1) {
-              onPatch({ op, path, value: params[paramIndex], oldValue: params[paramIndex + 1] })
-            } else if (params.length - paramIndex > 0) {
-              onPatch({ op, path, value: params[paramIndex] })
-            } else {
-              onPatch({ op, path })
-            }
-          } else {
-            throw new Error(`Unknown serializer: ${this.client.serializer}`)
           }
         } catch (error) {
           throw new Error(error)

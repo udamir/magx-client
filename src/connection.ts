@@ -1,4 +1,4 @@
-import * as notepack from "notepack.io"
+import { PatchPack } from "patchpack"
 
 import { IMessagePack, IConnection, ICTParams, IMessage } from "."
 
@@ -13,7 +13,7 @@ export class WSConnection implements IConnection {
     this.url = params.url
     this.protocol = params.protocol
     this.ws = new WebSocket(params.url, params.protocol)
-    this.messagePack = params.messagePack || notepack
+    this.messagePack = params.messagePack || PatchPack
   }
 
   public onClose(handler: (code: number, reason: string) => void) {

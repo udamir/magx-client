@@ -17,8 +17,6 @@ module.exports = function(options) {
             filename: "[name].js",
 
             globalObject: "self || this", // compatibility with Web Workers.
-            libraryTarget: "umd",
-            library: "MagX"
         },
 
         // devtool: 'inline-source-map',
