@@ -18,7 +18,7 @@
   "author": "Damir Yusipov",
   "license": "MIT",
   "dependencies": {
-    "patchpack": "^0.4.1"
+    "patchpack": "^0.4.2"
   },
   "devDependencies": {
     "@types/node": "^14.14.10",
