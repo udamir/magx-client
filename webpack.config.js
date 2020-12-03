@@ -21,7 +21,7 @@ module.exports = function(options) {
             library: "MagX"
         },
 
-        // devtool: 'inline-source-map',
+        devtool: 'eval',
 
         module: {
             rules: [

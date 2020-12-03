@@ -1,5 +1,5 @@
 import { send, WSConnection, Room, IRoomData } from "."
-import { ISerializer, SchemaSerializer } from "./serializer"
+import { ISerializer } from "./serializer"
 
 export interface IJsonPatch {
   op: "replace" | "add" | "remove"
@@ -71,7 +71,7 @@ export interface IClientParams {
   id?: string
   token?: string
   data?: any
-  serializer?: ISerializer
+  serializer?: new () => ISerializer
   transport?: (params: ICTParams) => IConnection
 }
 
@@ -81,12 +81,12 @@ export class Client {
   public address: string
   public port?: number
   public transport: (params: ICTParams) => IConnection
-  public serializer?: ISerializer
+  public serializer?: any
 
   constructor(params: IClientParams) {
     this.address = params.address || "localhost"
     this.port = params.port
-    this.serializer = params.serializer || new SchemaSerializer()
+    this.serializer = params.serializer
     this.uri = `${params.secure ? "https" : "http"}://${this.address}${this.port ? ":" + this.port : ""}/magx`
     this.transport = params.transport || ((p) => new WSConnection(p))
   }
@@ -169,8 +169,8 @@ export class Client {
     return new Promise((resolve, reject) => {
       const room = new Room(this, data)
       room.onConnected(() => {
-        room.connection.send({ event: reconnect ? ClientEvent.reconnected : ClientEvent.joined, args: [] })
         resolve(room)
+        room.connection.send({ event: reconnect ? ClientEvent.reconnected : ClientEvent.joined, args: [] })
       })
       room.onError((code, error) => reject(`${code} - ${error}`))
     })

@@ -1,4 +1,5 @@
 import { Client, IJsonPatch, IConnection, IMessage, IRoomUpdate, ClientEvent } from "."
+import { ISerializer } from "./serializer"
 
 interface IChangeHandler {
   op: string
@@ -20,6 +21,7 @@ export class Room {
   public name: string
   public patchIndex: number = 0
   public options: any
+  public serializer?: ISerializer
 
   public handlers: { [event: string]: any } = {}
 
@@ -28,6 +30,7 @@ export class Room {
     this.port = roomData.port || this.client.port
     this.name = roomData.name
     this.options = roomData.options || {}
+    this.serializer = client.serializer ? new client.serializer() : undefined
 
     this.handlers = {
       _message: {},
@@ -55,8 +58,8 @@ export class Room {
       }
 
       const onSnapshot: any = (snapshot: any) => {
-        if (this.client.serializer) {
-          snapshot = this.client.serializer.decodeState(snapshot)
+        if (this.serializer) {
+          snapshot = this.serializer.decodeState(snapshot)
         }
         this.handlers._snapshot && this.handlers._snapshot(snapshot)
       }
@@ -88,8 +91,8 @@ export class Room {
 
       const onEncodedPatch: any = (buffer: any) => {
         try {
-          if (this.client.serializer) {
-            const patch = this.client.serializer.decodePatch(buffer)
+          if (this.serializer) {
+            const patch = this.serializer.decodePatch(buffer)
             onPatch(patch)
           }
         } catch (error) {
