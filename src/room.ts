@@ -42,7 +42,7 @@ export class Room {
       throw new Error(`Cannot create room - not authorized client`)
     }
 
-    const url = `ws://${this.client.address}${this.port ? ":" + this.port : ""}/${this.id}?${this.client.auth.token}`
+    const url = `${this.client.secure ? 'wss' : 'ws'}://${this.client.address}${this.port ? ":" + this.port : ""}/${this.id}?${this.client.auth.token}`
     this.connection = this.client.transport({ url })
 
     this.connection.onMessage((msg: IMessage) => {

@@ -82,11 +82,13 @@ export class Client {
   public port?: number
   public transport: (params: ICTParams) => IConnection
   public serializer?: any
+  public secure?: boolean
 
   constructor(params: IClientParams) {
     this.address = params.address || "localhost"
     this.port = params.port
     this.serializer = params.serializer
+    this.secure = params.secure
     this.uri = `${params.secure ? "https" : "http"}://${this.address}${this.port ? ":" + this.port : ""}/magx`
     this.transport = params.transport || ((p) => new WSConnection(p))
   }
